@@ -45,7 +45,7 @@
 					firstScriptTag = doc.getElementsByTagName('script')[0],
 					done = false;
 
-				script.src = 'https://cdn.rawgit.com/googlevr/vrview/master/build/vrview.min.js';
+				script.src = 'https://storage.googleapis.com/vrview/2.0/build/vrview.min.js';
 
 				// Attach handlers for all browsers
 				script.onload = script.onreadystatechange = function () {
