@@ -2033,7 +2033,7 @@ mejs.version = '3.0';
 		url = url.toLowerCase();
 
 		if (url.indexOf('www.youtube') > -1 || url.indexOf('//youtu.be') > -1) {
-			return 'video/youtube';
+			return 'video/x-youtube';
 		} else {
 			return null;
 		}
@@ -2588,8 +2588,8 @@ mejs.version = '3.0';
 
 		url = url.toLowerCase();
 
-		if (url.indexOf('player.vimeo') > -1) {
-			return 'video/vimeo';
+		if (url.indexOf('player.vimeo') > -1 || url.indexOf('vimeo.com') > -1) {
+			return 'video/x-vimeo';
 		} else {
 			return null;
 		}
@@ -2683,6 +2683,7 @@ mejs.version = '3.0';
 		 * Extract numeric value from Vimeo to be loaded through API
 		 * Valid URL format(s):
 		 *  - https://player.vimeo.com/video/59777392
+		 *  - https://vimeo.com/59777392
 		 *
 		 * @param {String} url - Vimeo full URL to grab the number Id of the source
 		 * @return {int}
@@ -3082,15 +3083,16 @@ mejs.version = '3.0';
 			var
 				height = mediaElement.originalNode.height,
 				width = mediaElement.originalNode.width,
-				vimeoContainer = doc.createElement('iframe')
-				;
+				vimeoContainer = doc.createElement('iframe'),
+				standardUrl = 'https://player.vimeo.com/video/' + vimeoApi.getVimeoId(mediaFiles[0].src)
+			;
 
 			// Create Vimeo <iframe> markup
 			vimeoContainer.setAttribute('id', vimeo.id);
 			vimeoContainer.setAttribute('width', width);
 			vimeoContainer.setAttribute('height', height);
 			vimeoContainer.setAttribute('frameBorder', '0');
-			vimeoContainer.setAttribute('src', mediaFiles[0].src);
+			vimeoContainer.setAttribute('src', standardUrl);
 			vimeoContainer.setAttribute('webkitallowfullscreen', '');
 			vimeoContainer.setAttribute('mozallowfullscreen', '');
 			vimeoContainer.setAttribute('allowfullscreen', '');
@@ -3145,7 +3147,7 @@ mejs.version = '3.0';
 		url = url.toLowerCase();
 
 		if (url.indexOf('dailymotion.com') > -1 || url.indexOf('dai.ly') > -1) {
-			return 'video/dailymotion';
+			return 'video/x-dailymotion';
 		} else {
 			return null;
 		}
@@ -3635,7 +3637,7 @@ mejs.version = '3.0';
 		url = url.toLowerCase();
 
 		if (url.indexOf('www.facebook') > -1) {
-			return 'video/facebook';
+			return 'video/x-facebook';
 		} else {
 			return null;
 		}
@@ -4045,7 +4047,7 @@ mejs.version = '3.0';
 		url = url.toLowerCase();
 
 		if (url.indexOf('soundcloud.com') > -1) {
-			return 'video/soundcloud';
+			return 'video/x-soundcloud';
 		} else {
 			return null;
 		}
@@ -6021,7 +6023,7 @@ if (jQuery !== undefined) {
 				$('<span class="mejs-offscreen">' + videoPlayerTitle + '</span>').insertBefore(t.$media);
 				// build container
 				t.container =
-					$('<div id="' + t.id + '" class="mejs-container mejs-keyboard-inactive" ' +
+					$('<div id="' + t.id + '" class="mejs-container mejs__container--keyboard-inactive" ' +
 						'tabindex="0" role="application" aria-label="' + videoPlayerTitle + '">' +
 						'<div class="mejs-inner">' +
 						'<div class="mejs-mediaelement"></div>' +
@@ -6572,18 +6574,18 @@ if (jQuery !== undefined) {
 				// Disable focus outline to improve look-and-feel for regular users
 				t.globalBind('click', function(e) {
 					if ($(e.target).is('.mejs-container')) {
-						$(e.target).addClass('mejs-keyboard-inactive');
+						$(e.target).addClass('mejs__container--keyboard-inactive');
 					} else if ($(e.target).closest('.mejs-container').length) {
-						$(e.target).closest('.mejs-container').addClass('mejs-keyboard-inactive');
+						$(e.target).closest('.mejs-container').addClass('mejs__container--keyboard-inactive');
 					}
 				});
 
 				// Enable focus outline for Accessibility purposes
 				t.globalBind('keydown', function(e) {
 					if ($(e.target).is('.mejs-container')) {
-						$(e.target).removeClass('mejs-keyboard-inactive');
+						$(e.target).removeClass('mejs__container--keyboard-inactive');
 					} else if ($(e.target).closest('.mejs-container').length) {
-						$(e.target).closest('.mejs-container').removeClass('mejs-keyboard-inactive');
+						$(e.target).closest('.mejs-container').removeClass('mejs__container--keyboard-inactive');
 					}
 				});
 
