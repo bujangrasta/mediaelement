@@ -115,7 +115,8 @@
 		 * @return {Boolean}
 		 */
 		canPlayType: function (type) {
-			var mediaTypes = ['video/mp4'];
+			var mediaTypes = ['video/mp4', 'application/x-mpegURL', 'application/x-mpegurl',
+				'vnd.apple.mpegURL', 'video/hls', 'application/dash+xml'];
 
 			return mediaTypes.indexOf(type) > -1;
 		},
@@ -135,7 +136,7 @@
 				VrAPIReady = false,
 				vr = {},
 				vrPlayer = null,
-				paused = true,
+				paused = false,
 				volume = 1,
 				oldVolume = volume,
 				currentTime = 0,
@@ -173,6 +174,7 @@
 								case 'muted':
 									return volume === 0;
 								case 'paused':
+									paused = vrPlayer.isPaused;
 									return paused;
 
 								case 'ended':
@@ -279,36 +281,39 @@
 				VrAPIReady = true;
 				mediaElement.vrPlayer = vrPlayer = _vrPlayer;
 
-				var vrDiv = doc.getElementById(vr.id), events;
+				vrPlayer.on('ready', function() {
 
-				// a few more events
-				events = ['mouseover', 'mouseout'];
+					vrPlayer.pause();
 
-				var assignEvents = function (e) {
-					var event = mejs.Utils.createEvent(e.type, vr);
-					mediaElement.dispatchEvent(event);
-				};
+					// a few more events
+					events = ['mouseover', 'mouseout'];
 
-				for (var j in events) {
-					var eventName = events[j];
-					mejs.addEvent(vrDiv, eventName, assignEvents);
-				}
+					var assignEvents = function (e) {
+						var event = mejs.Utils.createEvent(e.type, vr);
+						mediaElement.dispatchEvent(event);
+					};
 
-				// give initial events
-				events = ['rendererready', 'loadeddata', 'loadedmetadata', 'canplay'];
+					for (var j in events) {
+						var eventName = events[j];
+						mejs.addEvent(vrPlayer, eventName, assignEvents);
+					}
 
-				for (i = 0, il = events.length; i < il; i++) {
-					var event = mejs.Utils.createEvent(events[i], vr);
-					mediaElement.dispatchEvent(event);
-				}
+					// give initial events
+					events = ['rendererready', 'loadeddata', 'loadedmetadata', 'canplay'];
+
+					for (i = 0, il = events.length; i < il; i++) {
+						var event = mejs.Utils.createEvent(events[i], vr);
+						mediaElement.dispatchEvent(event);
+					}
+				});
 			};
 
-			var
-				height = mediaElement.originalNode.height,
-				width = mediaElement.originalNode.width,
-				//vrContainer = doc.createElement('iframe')
-				vrContainer = doc.createElement('div')
-			;
+			var vrContainer = doc.createElement('div');
+
+			// Create <iframe> markup
+			vrContainer.setAttribute('id', vr.id);
+			vrContainer.style.width = '100%';
+			vrContainer.style.height = '100%';
 
 			mediaElement.originalNode.parentNode.insertBefore(vrContainer, mediaElement.originalNode);
 			mediaElement.originalNode.style.display = 'none';
@@ -317,25 +322,12 @@
 				for (i = 0, il = mediaFiles.length; i < il; i++) {
 					if (mejs.Renderers.renderers[options.prefix].canPlayType(mediaFiles[i].type)) {
 						options.vr.video = mediaFiles[i].src;
-						options.vr.width = width;
-						options.vr.height = height;
+						options.vr.width = '100%';
+						options.vr.height = '100%';
 						break;
 					}
 				}
 			}
-
-			var opt = {};
-			// Create URL based on options
-			for (var property in options.vr) {
-				if (vr.hasOwnProperty(property) && vr[property]) {
-					opt[property] = vr[property];
-				}
-			}
-
-			console.log(opt);
-
-			// Create <iframe> markup
-			vrContainer.setAttribute('id', vr.id);
 
 			VrAPI.prepareSettings({
 				options: options.vr,
@@ -349,8 +341,7 @@
 				}
 			};
 			vr.setSize = function (width, height) {
-				vrContainer.setAttribute('width', width);
-				vrContainer.setAttribute('height', height);
+
 			};
 			vr.show = function () {
 				if (vrPlayer) {

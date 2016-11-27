@@ -1401,7 +1401,7 @@
 						}
 					});
 
-			if (t.media.rendererName !== null && t.media.rendererName.match(/(youtube|facebook)/)) {
+			if (t.options.supportVR || (t.media.rendererName !== null && t.media.rendererName.match(/(youtube|facebook)/))) {
 				bigPlay.hide();
 			}
 
